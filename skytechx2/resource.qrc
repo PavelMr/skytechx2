@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/opengl/fshader.glsl</file>
+        <file>res/opengl/vshader.glsl</file>
+        <file>res/stars/star.png</file>
+        <file>res/opengl/const_line_fshader.glsl</file>
+        <file>res/opengl/const_line_vshader.glsl</file>
+        <file>res/opengl/dso_fshader.glsl</file>
+        <file>res/opengl/dso_vshader.glsl</file>
+        <file>res/opengl/dso_gshader.glsl</file>
+        <file>res/stars/dot.png</file>
+        <file>res/opengl/text_fshader.glsl</file>
+        <file>res/opengl/text_gshader.glsl</file>
+        <file>res/opengl/text_vshader.glsl</file>
+        <file>res/opengl/gshader.glsl</file>
+        <file>res/opengl/common.glsl</file>
+        <file>res/opengl/grid_line_fshader.glsl</file>
+        <file>res/opengl/grid_line_vshader.glsl</file>
+        <file>res/stars/stars2.png</file>
+        <file>res/stars/star_halo.png</file>
+    </qresource>
+</RCC>
