@@ -4,9 +4,8 @@
 #
 #-------------------------------------------------
 
-QT += core gui opengl
-
-QT += widgets
+QT += core gui
+QT += widgets opengl
 
 TARGET = skytechx2
 TEMPLATE = app
@@ -42,7 +41,12 @@ SOURCES += main.cpp\
     renderer/textrenderer.cpp \
     renderer/layergrid.cpp \
     core/skdebug.cpp \
-    renderer/text2drenderer.cpp
+    renderer/text2drenderer.cpp \
+    mapobject/mapobject.cpp \
+    renderer/painteroverlay.cpp \
+    catalogue/gsc.cpp \
+    renderer/layergscstars.cpp \
+    renderer/starshader.cpp
 
 HEADERS  += mainwindow/mainwindow.h \
     mainwindow/sidebar/sidebarquickinfo.h \
@@ -67,7 +71,12 @@ HEADERS  += mainwindow/mainwindow.h \
     renderer/textrenderer.h \
     renderer/layergrid.h \
     core/skdebug.h \
-    renderer/text2drenderer.h
+    renderer/text2drenderer.h \
+    mapobject/mapobject.h \
+    renderer/painteroverlay.h \
+    catalogue/gsc.h \
+    renderer/layergscstars.h \
+    renderer/starshader.h
 
 FORMS    += mainwindow/mainwindow.ui \
     mainwindow/sidebar/sidebarquickinfo.ui \

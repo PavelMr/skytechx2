@@ -3,9 +3,9 @@
 
 #include "renderer.h"
 #include "transform.h"
+#include "painteroverlay.h"
 
 #include <QWidget>
-#include <QGLFormat>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLDebugMessage>
@@ -21,13 +21,16 @@ protected:
   void initializeGL() Q_DECL_OVERRIDE;
   void resizeGL(int w, int h) Q_DECL_OVERRIDE;
   void paintGL() Q_DECL_OVERRIDE;
-  //void paintEvent(QPaintEvent *e);
+  //void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
 
   void wheelEvent(QWheelEvent *e);
   void mousePressEvent(QMouseEvent *e);
   void mouseMoveEvent(QMouseEvent *e);
 
+  void keyPressEvent(QKeyEvent *e);
+
 private:
+  PainterOverlay *m_painterOverlay;
   Renderer *m_renderer;
   double m_width;
   double m_height;

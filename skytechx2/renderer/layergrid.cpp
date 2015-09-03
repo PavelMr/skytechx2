@@ -8,7 +8,7 @@
 
 #include "textrenderer.h"
 
-TextRenderer rr;
+//TextRenderer rr;
 
 LayerGrid::LayerGrid()
 {
@@ -25,7 +25,7 @@ void LayerGrid::createResources()
   m_buffer.create();
   m_buffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
   m_buffer.bind();
-  m_buffer.allocate(MAX_GRID_POINTS * sizeof(QVector3D));
+  m_buffer.allocate(MAX_GRID_POINTS * sizeof(gridLine_t));
 
 }
 
@@ -33,17 +33,17 @@ void LayerGrid::render(Transform *transform)
 {
   QMatrix4x4 mat;
 
-  rr.createTexture("grid", 512, "arial", 10, QVector4D(1, 0, 0, 1) );
+  //rr.createTexture("grid", 1024, "arial", 10, QVector4D(1, 0, 0, 1) );
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  transform->getGl()->glEnable(GL_BLEND);
+  transform->getGl()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   render(transform, mat, 0);
 
-  glDisable(GL_BLEND);
+  transform->getGl()->glDisable(GL_BLEND);
 
-  rr.createResources();
-  rr.render(transform);
+  //rr.createResources();
+  //rr.render(transform);
 }
 
 void LayerGrid::render(Transform *transform, QMatrix4x4 &matrix, int type)
@@ -55,13 +55,19 @@ void LayerGrid::render(Transform *transform, QMatrix4x4 &matrix, int type)
   int count = generateGrid(transform, matrix, type);
 
   m_buffer.bind();
-  m_buffer.write(0, m_vertices, count * sizeof(QVector3D));
+  m_buffer.write(0, m_vertices, count * sizeof(gridLine_t));
 
   int vertexLocation = m_program.attributeLocation("a_position");
   m_program.enableAttributeArray(vertexLocation);
-  m_program.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+  m_program.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(gridLine_t));
 
-  glDrawArrays(GL_LINES, 0, count);
+  int vertexLocation1 = m_program.attributeLocation("a_color");
+  m_program.enableAttributeArray(vertexLocation1);
+  m_program.setAttributeBuffer(vertexLocation1, GL_FLOAT, offsetof(gridLine_t, color), 4, sizeof(gridLine_t));
+
+  transform->getGl()->glLineWidth(2);
+  transform->getGl()->glDrawArrays(GL_LINES, 0, count);
+  transform->getGl()->glLineWidth(1);
 
   m_program.release();
   m_buffer.release();
@@ -78,10 +84,9 @@ int LayerGrid::generateGrid(Transform *transform, QMatrix4x4 &matrix, int type)
   double spcy;
   double fov = transform->getMapParam()->m_fov;
   int stepx = 1;
-  int stepy = 5;
+  int stepy = 1;
 
-  /*
-  if (fov > SkMath::toRad(45)) {stepx = 1;
+  if (fov > SkMath::toRad(45)) stepx = 1;
     else
   if (fov > SkMath::toRad(10)) stepx = 2;
     else
@@ -91,13 +96,20 @@ int LayerGrid::generateGrid(Transform *transform, QMatrix4x4 &matrix, int type)
     else
   if (fov > SkMath::toRad(4)) stepx = 20;
     else stepx = 40;
-    */
+
+  stepy = stepx;
+
+  if (qAbs(transform->getMapParam()->m_y) > SkMath::toRad(45))
+    stepx /= 2;
+  else
+  if (qAbs(transform->getMapParam()->m_y) > SkMath::toRad(60))
+    stepx /= 4;
+
+  stepx = qBound(1, stepx, 40);
+  stepy = qBound(1, stepy, 40);
 
   spcx = SkMath::toRad(10 / (double)stepx);
   spcy = SkMath::toRad(10 / (double)stepy);
-
-
-  //qDebug() << SkMath::toDeg(spc);
 
   for (int y = -90; y < 90; y += 10)
   {
@@ -125,9 +137,6 @@ int LayerGrid::generateGrid(Transform *transform, QMatrix4x4 &matrix, int type)
         continue;
       }
 
-      //double sy = 0;
-      //double sx = 0;
-
       for (int sy = 0; sy < stepy; sy++)
       {
         for (int sx = 0; sx < stepx; sx++)
@@ -154,36 +163,48 @@ int LayerGrid::generateGrid(Transform *transform, QMatrix4x4 &matrix, int type)
             continue;
           }
 
-          if (qAbs(srd[0].dec) < SkMath::toRad(80))
+          QVector4D  cc1 = QVector4D(1, 1, 1, 0.25);
+
+          if (y == 0 && sy == 0)
           {
-            count = interpolateLine(matrix, 5, &srd[0], &srd[1], count, transform);
-
-            rr.addText(QString::number(SkMath::toDeg(srd[0].dec)), srd[0], GL_TA_LEFT);
-            rr.addText(QString::number(SkMath::toDeg(srd[1].dec)), srd[0], GL_TA_RIGHT);
-            //rr.addText(QString::number(SkMath::toDeg(srd[0].ra)), srd[0], GL_TA_RIGHT);
-
-            m_vertices[count++] = vec[0].toQVector();
-            m_vertices[count++] = vec[3].toQVector();
-
-            if (count >= MAX_GRID_POINTS)
-            {
-              return count;
-            }
+            cc1 = QVector4D(1, 0, 0, 1);
           }
+
+          count = interpolateLine(matrix, 6, &srd[0], &srd[1], count, transform, cc1);
+
+          //rr.addText(QString::number(SkMath::toDeg(srd[0].dec)), srd[0], GL_TA_LEFT);
+          //rr.addText(QString::number(SkMath::toDeg(srd[0].ra)), srd[0], GL_TA_RIGHT);
+          //rr.addText(QString::number(vec[0].x) + ", " +
+          //           QString::number(vec[0].y) + ", " +
+          //           QString::number(vec[0].z), srd[0], GL_TA_RIGHT);
+
+          if ((y >= -80 && y < 80) ||
+             ((srd[0].ra == 0) || (srd[0].ra == R90) || (srd[0].ra == R180) || (srd[0].ra == R270)))
+          {
+           QVector4D  cc1 = QVector4D(1, 1, 1, 0.25);
+
+            m_vertices[count].pos = vec[0].toQVector();
+            m_vertices[count++].color = cc1;
+
+            m_vertices[count].pos = vec[3].toQVector();
+            m_vertices[count++].color = cc1;
+          }
+
+          if (count >= MAX_GRID_POINTS)
+          {
+            return count;
+          }
+
         }
       }
     }
   }
 
-  //rr.save();
-
-  //qDebug() << count;
-
   return count;
 }
 
 
-int LayerGrid::interpolateLine(QMatrix4x4 &mat, int c, RaDec *rd1, RaDec *rd2, int count, Transform *transform)
+int LayerGrid::interpolateLine(QMatrix4x4 &mat, int c, RaDec *rd1, RaDec *rd2, int count, Transform *transform, QVector4D &color)
 {
   double dx = (rd2->ra - rd1->ra) / (double)(c - 1);
   RaDec rd = RaDec(rd1->ra, rd1->dec);
@@ -199,8 +220,11 @@ int LayerGrid::interpolateLine(QMatrix4x4 &mat, int c, RaDec *rd1, RaDec *rd2, i
 
     transform->rdToVector(rd, pt2);//, mat);
 
-    m_vertices[count++] = pt1.toQVector();
-    m_vertices[count++] = pt2.toQVector();
+    m_vertices[count].pos = pt1.toQVector();
+    m_vertices[count++].color = color;
+
+    m_vertices[count].pos = pt2.toQVector();
+    m_vertices[count++].color = color;
 
     pt1 = pt2;
   }

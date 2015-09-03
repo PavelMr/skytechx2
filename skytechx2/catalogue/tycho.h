@@ -69,7 +69,7 @@ class Tycho : public QObject
   Q_OBJECT
 
   public:
-    CTycho();
+    Tycho();
     bool load();
 
     tychoSupp_t             *m_supplement;

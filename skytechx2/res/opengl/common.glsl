@@ -1,6 +1,5 @@
 float getSize(float mag)
 {
-  float vm;
   float a = 38.0;
   float brMag = 0;
   float faMag = u_mag_limit;
@@ -11,8 +10,10 @@ float getSize(float mag)
   }
 
   mag = clamp(mag, brMag, faMag);
-  vm = mag / (faMag - brMag);
-  vm = pow (vm - 1, 3) + 1;
+  float linear = mag / (faMag - brMag);
+  float cubic = pow (linear - 1, 3) + 1;
 
-  return 1 + a * clamp(1 - vm, 0, 1);
+  float size = mix(linear, cubic, 0.8);
+
+  return 1.5 + a * clamp(1 - size, 0, 1);
 }

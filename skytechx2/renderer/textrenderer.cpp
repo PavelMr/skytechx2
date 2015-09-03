@@ -3,11 +3,10 @@
 
 #include <QImage>
 #include <QPainter>
-#include <QOpenGLFunctions>
+
 
 static bool firstTime = true;
 static QOpenGLShaderProgram m_program;
-
 
 TextRenderer::TextRenderer() :
   m_image(0)
@@ -195,7 +194,7 @@ void TextRenderer::render(Transform *transform, float magLimit)
   }
 
   transform->getGl()->glActiveTexture(GL_TEXTURE0);
-  glEnable(GL_TEXTURE_2D);
+  transform->getGl()->glEnable(GL_TEXTURE_2D);
   m_program.setUniformValue("texture", 0);
   m_texture->bind();
 
@@ -226,21 +225,16 @@ void TextRenderer::render(Transform *transform, float magLimit)
   m_program.enableAttributeArray(vertexLocation3);
   m_program.setAttributeBuffer(vertexLocation3,  GL_FLOAT, offsetof(textVertex_t, align), 1, sizeof(textVertex_t));
 
-  /*
-  qDebug() << "offset uv" << offsetof(textVertex_t, uv);
-  qDebug() << "offset wh" << offsetof(textVertex_t, wh);
-  qDebug() << "offset mag" << offsetof(textVertex_t, mag);
-  qDebug() << "offset al" << offsetof(textVertex_t, align);
-  qDebug() << "size" << sizeof(textVertex_t);
-  */
 
+  transform->getGl()->glEnable(GL_BLEND);
+  transform->getGl()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  transform->getGl()->glDrawArrays(GL_POINTS, 0, m_glCount);
 
-  glDrawArrays(GL_POINTS, 0, m_glCount);
+  transform->getGl()->glDisable(GL_BLEND);
 
-  glDisable(GL_BLEND);
+  transform->getGl()->glActiveTexture(GL_TEXTURE0);
+  transform->getGl()->glDisable(GL_TEXTURE_2D);
 
   m_program.release();
 

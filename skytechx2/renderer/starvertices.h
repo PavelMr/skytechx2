@@ -3,7 +3,7 @@
 
 typedef struct {
   float x, y, z;
-  float colorMagnitude[4];
+  float colorMagnitude[4];   // rgb + magnitude
 } starVertex_t;
 
 #endif // STARVERTICES_H

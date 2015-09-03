@@ -7,7 +7,7 @@
 
 typedef struct
 {
-   double ra, dec;
+   RaDec  rd;
    qint32 cmd;     // 0-data, 1-main line to, 2-sec. line to
 } constellationLines_t;
 

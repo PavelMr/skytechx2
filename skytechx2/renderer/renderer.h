@@ -5,6 +5,10 @@
 
 class LayerTychoStars;
 class LayerConstellations;
+class LayerGSCStars;
+
+class StarShader;
+
 class LayerGrid;
 class Transform;
 
@@ -15,11 +19,17 @@ public:
   void createStaticResources();
   void render(Transform *transform);
 
+  StarShader *getStarShaderProgram();
+
   static QString readShader(const QString &fileName);
 private:
   LayerTychoStars *m_layerTychoStars;
+  LayerGSCStars *m_layerGSCStars;
+
   LayerConstellations *m_layerConstellations;
   LayerGrid *m_layerGrid;
+
+  StarShader *m_starShader;
 
   static QString readTextFile(const QString &fileName);
 };

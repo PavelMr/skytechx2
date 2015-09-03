@@ -15,17 +15,20 @@ int main(int argc, char *argv[])
 
   MainWindow w;
   w.show();
+  w.resize(1600, 900);
+  w.move(100, 100);
 
+  /*
   QEasingCurve cc(QEasingCurve::OutCubic);
-
   for (double i = 0; i < 1; i += 0.1)
   {
     double t = i;
     double b = 0;
     double c = 1;
     double d = 1;
-    qDebug() << i << cc.valueForProgress(i) << pow (t - 1, 3) + 1;
+    //qDebug() << i << cc.valueForProgress(i) << pow (t - 1, 3) + 1;
   }
+  */
 
   /*
   TextRenderer r;

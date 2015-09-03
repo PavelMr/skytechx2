@@ -14,6 +14,10 @@ static const char greekChar[25] = {'a','b','g','d','e','z','h','J','i','k',
                                    'j','c','y','w','?'};
 
 
+Tycho::Tycho()
+{
+}
+
 bool Tycho::load()
 {
   SkFile file("resources/stars/tycho2/tycho2.dat");

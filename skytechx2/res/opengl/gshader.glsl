@@ -81,31 +81,34 @@ void main()
   EndPrimitive();
 
 
-  if (v_size[0] > 15)
+  float minHaloSize = 10;
+
+  // star halo
+  if (v_size[0] > minHaloSize)
   {
-    float a = 0.5 * (v_size[0] - 15) / (38 - 15);
+    float a = 0.5 * (v_size[0] - 15) / (38 - minHaloSize);
 
     gl_Position = P + p[0] * scale * 3;
     f_uv = vec2(0, 0);
-    f_color = vec4(v_color[0].rgb, a);
+    f_color = vec4(1, 1, 1, a);
     f_texture = 1;
     EmitVertex();
 
     gl_Position = P + p[1] * scale * 3;
     f_uv = vec2(1, 0);
-    f_color = vec4(v_color[0].rgb, a);
+    f_color = vec4(1, 1, 1, a);
     f_texture = 1;
     EmitVertex();
 
     gl_Position = P + p[2] * scale * 3;
     f_uv = vec2(0, 1);
-    f_color = vec4(v_color[0].rgb, a);
+    f_color = vec4(1, 1, 1, a);
     f_texture = 1;
     EmitVertex();
 
     gl_Position = P + p[3] * scale * 3;
     f_uv = vec2(1 ,1);
-    f_color = vec4(v_color[0].rgb, a);
+    f_color = vec4(1, 1, 1, a);
     f_texture = 1;
     EmitVertex();
 

@@ -18,5 +18,7 @@
         <file>res/opengl/grid_line_vshader.glsl</file>
         <file>res/stars/stars2.png</file>
         <file>res/stars/star_halo.png</file>
+        <file>res/opengl/overlay2d_fshader.glsl</file>
+        <file>res/opengl/overlay2d_vshader.glsl</file>
     </qresource>
 </RCC>

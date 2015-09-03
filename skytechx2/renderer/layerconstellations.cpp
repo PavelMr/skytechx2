@@ -36,6 +36,10 @@ void LayerConstellations::createResourcesLines()
 {
   constellationLines_t from, to;
 
+  // suppress warning
+  from.rd = RaDec(0, 0);
+  to.rd = RaDec(0, 0);
+
   QVector <lineVertex_t> vertex;
 
   m_glLinesCount = 0;
@@ -61,14 +65,14 @@ void LayerConstellations::createResourcesLines()
       lineVertex_t v1, v2;
       Vector3 vec;
 
-      Transform::rdToVector(RaDec(from.ra, from.dec), vec);
+      Transform::rdToVector(from.rd, vec);
       v1.x = vec.x;
       v1.y = vec.y;
       v1.z = vec.z;
       v1.u = 0;
       m_glLinesCount++;
 
-      Transform::rdToVector(RaDec(to.ra, to.dec), vec);
+      Transform::rdToVector(to.rd, vec);
       v2.x = vec.x;
       v2.y = vec.y;
       v2.z = vec.z;
@@ -135,43 +139,29 @@ void LayerConstellations::createResourcesBoundaries()
 
      if (pCon->p)
      {
-       //if (inter > 1 && fabs(pCon->rd.Dec - pCon2->rd.Dec) < DEG2RAD(0.25))
-//       {
-//         drawInterpolatedLineRD(inter, &pCon2->rd, &pCon->rd, p, &prec);
-//       }
-//       else
-       {
-         //trfRaDecToPointNoCorrect(&pCon->rd, &p1, &prec);
-         //trfRaDecToPointNoCorrect(&pCon2->rd, &p2, &prec);
+       lineVertex_t v1, v2;
+       Vector3 vec;
 
-         //if (trfProjectLine(&p1, &p2))
-          //p->drawLine(p1.sx, p1.sy, p2.sx, p2.sy);
+       Transform::rdToVector(pCon->rd, vec);
+       v1.x = vec.x;
+       v1.y = vec.y;
+       v1.z = vec.z;
+       v1.u = 0;
+       m_glBoundariesCount++;
 
-         lineVertex_t v1, v2;
-         Vector3 vec;
+       Transform::rdToVector(pCon2->rd, vec);
+       v2.x = vec.x;
+       v2.y = vec.y;
+       v2.z = vec.z;
 
-         Transform::rdToVector(pCon->rd, vec);
-         v1.x = vec.x;
-         v1.y = vec.y;
-         v1.z = vec.z;
-         v1.u = 0;
-         m_glBoundariesCount++;
+       Vector3 v;
 
-         Transform::rdToVector(pCon2->rd, vec);
-         v2.x = vec.x;
-         v2.y = vec.y;
-         v2.z = vec.z;
+       SKVecSub(&v, Vector3(v1.x, v1.y, v1.z), Vector3(v2.x, v2.y, v2.z));
+       v2.u = 50 * sqrt(v.x * v.x + v.y * v.y + v.z * v.z);;
+       m_glBoundariesCount++;
 
-         Vector3 v;
-
-         SKVecSub(&v, Vector3(v1.x, v1.y, v1.z), Vector3(v2.x, v2.y, v2.z));
-         v2.u = 50 * sqrt(v.x * v.x + v.y * v.y + v.z * v.z);;
-         m_glBoundariesCount++;
-
-         vertex.append(v1);
-         vertex.append(v2);
-
-       }
+       vertex.append(v1);
+       vertex.append(v2);
      }
    }
 
@@ -205,13 +195,13 @@ void LayerConstellations::render(Transform *transform)
   }
 
   transform->getGl()->glActiveTexture(GL_TEXTURE0);
-  glEnable(GL_TEXTURE_2D);
+  transform->getGl()->glEnable(GL_TEXTURE_2D);
   m_lineProgram.setUniformValue("texture", 0);
   texture->bind();
 
   //glLineWidth(2);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  transform->getGl()->glEnable(GL_BLEND);
+  transform->getGl()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   m_lineProgram.setUniformValue("mvp_matrix",  transform->getMVPMatrix());
   m_lineProgram.setUniformValue("scale", (float)(transform->m_fov));
@@ -226,7 +216,7 @@ void LayerConstellations::render(Transform *transform)
   m_lineProgram.enableAttributeArray(vertexLocation1);
   m_lineProgram.setAttributeBuffer(vertexLocation1, GL_FLOAT, 3 * sizeof(float), 1, sizeof(lineVertex_t));
 
-  glDrawArrays(GL_LINES, 0, m_glLinesCount);
+  transform->getGl()->glDrawArrays(GL_LINES, 0, m_glLinesCount);
   //glDisable(GL_BLEND);
 
   ///////////
@@ -242,10 +232,10 @@ void LayerConstellations::render(Transform *transform)
   m_lineProgram.enableAttributeArray(vertexLocation1);
   m_lineProgram.setAttributeBuffer(vertexLocation1, GL_FLOAT, 3 * sizeof(float), 1, sizeof(lineVertex_t));
 
-  glDrawArrays(GL_LINES, 0, m_glBoundariesCount);
+  transform->getGl()->glDrawArrays(GL_LINES, 0, m_glBoundariesCount);
 
 
-  glDisable(GL_BLEND);
+  transform->getGl()->glDisable(GL_BLEND);
   m_lineProgram.release();
   texture->release();
 

@@ -18,6 +18,8 @@
 #define D_UNDEF        qQNaN()
 #define D_IS_UNDEF(v)  qIsNaN(v)
 
+#define FRAC(f, from, to)     ((((f) - (from)) / (double)((to) - (from))))
+
 #define MAX_MAG_LIMIT       1000
 #define NO_MAG_LIMIT       -1000
 
@@ -25,6 +27,11 @@ class SkMath
 {
 public:
   SkMath();
+
+  static bool isNear(double val1, double val2, double tresshold = 0.000001)
+  {
+    return qAbs(val1 - val2) < tresshold;
+  }
 
   static void range(double &val, double rng)
   {

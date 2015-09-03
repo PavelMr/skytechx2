@@ -54,8 +54,8 @@ bool Constellations::loadLines()
     {
       constellationLines_t l;
 
-      f.read((char *)&l.ra, sizeof(double));
-      f.read((char *)&l.dec, sizeof(double));
+      f.read((char *)&l.rd.ra, sizeof(double));
+      f.read((char *)&l.rd.dec, sizeof(double));
       f.read((char *)&l.cmd, sizeof(qint32));
 
       m_constellationLines.append(l);

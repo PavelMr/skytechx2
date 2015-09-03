@@ -1,11 +1,14 @@
 #include "renderer.h"
 #include "layertychostars.h"
+#include "layergscstars.h"
 #include "layerconstellations.h"
 #include "layergrid.h"
 #include "transform.h"
 #include "dataresources.h"
 #include "gscregions.h"
 #include "skfile.h"
+#include "starshader.h"
+
 
 #include <QDebug>
 
@@ -66,11 +69,16 @@ void Renderer::createStaticResources()
   m_layerTychoStars = new LayerTychoStars();
   m_layerTychoStars->createReources();
 
+  m_layerGSCStars = new LayerGSCStars();
+
   m_layerConstellations = new LayerConstellations();
   m_layerConstellations->createResources();
 
   m_layerGrid = new LayerGrid();
   m_layerGrid->createResources();
+
+  m_starShader = new StarShader();
+  m_starShader->createResources();
 }
 
 void Renderer::render(Transform *transform)
@@ -78,7 +86,17 @@ void Renderer::render(Transform *transform)
   g_dataResource->getGscRegions()->checkVisibleRegions(transform->getFrustum());
 
   m_layerGrid->render(transform);
-  //m_layerConstellations->render(transform);
-  //m_layerTychoStars->render(transform);
+  m_layerConstellations->render(transform);
+
+  if (transform->getMapParam()->m_fov <= SkMath::toRad(15))
+  {
+    m_layerGSCStars->render(transform, this);
+  }
+  m_layerTychoStars->render(transform, this);
+}
+
+StarShader *Renderer::getStarShaderProgram()
+{
+  return m_starShader;
 }
 
