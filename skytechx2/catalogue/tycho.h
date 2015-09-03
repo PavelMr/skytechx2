@@ -76,11 +76,19 @@ class Tycho : public QObject
     QList   <tychoStar_t *>  tNames;         // list ptrs. to stars with proper name
 
     static QString getGreekChar(int i);
-    static float getMagnitude(tychoStar_t &s);
+    static float getMagnitude(tychoStar_t &s)
+    {
+      float bt = TYC_SHORT_TO_MAG(s.BTmag);
+      float vt = TYC_SHORT_TO_MAG(s.VTmag);
+
+      return(vt - 0.09f * (bt - vt));
+    }
 
     QString getStarName(tychoSupp_t *supp);
     QString getFlamsteedString(tychoSupp_t *supp, bool &found);
     QString getBayerString(tychoSupp_t *supp, bool &found);
+
+    int getMemoryUsage();
 
 public:
     tychoHead_t       m_head;

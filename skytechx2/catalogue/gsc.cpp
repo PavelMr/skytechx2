@@ -7,7 +7,8 @@
 static int l_band[10] = {0, 1, 6, 8, 10, 11, 12, 13, 14, 18};
 
 GSC::GSC() :
-  m_tableLoaded(false)
+  m_tableLoaded(false),
+  m_memoryUsage(0)
 {
 }
 
@@ -22,18 +23,41 @@ gscStarRegion_t *GSC::getRegion(int region)
 
   if (loadRegion(region, &gscRegion))
   {
-    if (m_regionMap.size() > 100)
+    if (m_regionMap.size() >= 200)
     {
       deleteOldestRegion();
     }
 
-    gscRegion.timer = QDateTime::currentMSecsSinceEpoch();
+    gscRegion.m_timer = QDateTime::currentMSecsSinceEpoch();
 
     m_regionMap[region] = gscRegion;
     return &m_regionMap[region];
   }
 
   return NULL;
+}
+
+int GSC::getMemoryUsage()
+{
+  return m_memoryUsage;
+}
+
+int GSC::getRegionUsed()
+{
+  return m_regionMap.size();
+}
+
+void GSC::clearCache()
+{
+  QMap <int, gscStarRegion_t>::iterator i;
+
+  for (i = m_regionMap.begin(); i != m_regionMap.end(); ++i)
+  {
+    free(i.value().gsc);
+  }
+
+  m_regionMap.clear();
+  m_memoryUsage = 0;
 }
 
 bool GSC::loadRegion(int index, gscStarRegion_t *region)
@@ -112,6 +136,9 @@ bool GSC::loadRegion(int index, gscStarRegion_t *region)
     file.read((char *)c, 12);
     decode(c, header, &region->gsc[i]);
   }
+
+  region->m_size = region->h.nobj * sizeof(gscStar_t);
+  m_memoryUsage += region->m_size;
 
   return true;
 }
@@ -203,22 +230,23 @@ void GSC::deleteOldestRegion()
 
   for (i = m_regionMap.begin(); i != m_regionMap.end(); ++i)
   {
-    if (i.value().timer < oldestTime)
+    if (i.value().m_timer < oldestTime)
     {
-      oldestTime = i.value().timer;
+      oldestTime = i.value().m_timer;
       key = i.key();
     }
   }
 
   if (key >= 0)
   {
+    free(m_regionMap[key].gsc);
+    m_memoryUsage -= m_regionMap[key].m_size;
     m_regionMap.remove(key);
   }
   else
   {
-    qDebug() << "deleteOldestRegion() failed()";
+    qDebug() << "GSC deleteOldestRegion() failed()";
   }
-
 }
 
 

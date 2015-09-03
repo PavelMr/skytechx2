@@ -37,6 +37,8 @@ private:
   Transform m_transform;
   QPoint m_lastPoint;
 
+  void writeDebug();
+
 signals:
 
 public slots:

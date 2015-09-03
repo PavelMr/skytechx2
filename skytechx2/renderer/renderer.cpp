@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "layertychostars.h"
 #include "layergscstars.h"
+#include "layerucac4stars.h"
 #include "layerconstellations.h"
 #include "layergrid.h"
 #include "transform.h"
@@ -70,6 +71,7 @@ void Renderer::createStaticResources()
   m_layerTychoStars->createReources();
 
   m_layerGSCStars = new LayerGSCStars();
+  m_layerUCAC4Stars = new LayerUCAC4Stars();
 
   m_layerConstellations = new LayerConstellations();
   m_layerConstellations->createResources();
@@ -90,8 +92,14 @@ void Renderer::render(Transform *transform)
 
   if (transform->getMapParam()->m_fov <= SkMath::toRad(15))
   {
-    m_layerGSCStars->render(transform, this);
+    //m_layerGSCStars->render(transform, this);
   }
+
+  if (transform->getMapParam()->m_fov <= SkMath::toRad(10))
+  {
+    m_layerUCAC4Stars->render(transform, this);
+  }
+
   m_layerTychoStars->render(transform, this);
 }
 

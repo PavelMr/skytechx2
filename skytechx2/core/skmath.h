@@ -19,6 +19,9 @@
 #define D_IS_UNDEF(v)  qIsNaN(v)
 
 #define FRAC(f, from, to)     ((((f) - (from)) / (double)((to) - (from))))
+#define CLAMP(v, mi, ma)       (((v) < (mi)) ? (mi) : ((v) > (ma)) ? (ma) : (v))
+#define SIGN(x)                ((x) >= 0 ? 1.0 : -1.0)
+#define LERP(f, mi, ma)        ((mi) + (f) * ((ma) - (mi)))
 
 #define MAX_MAG_LIMIT       1000
 #define NO_MAG_LIMIT       -1000

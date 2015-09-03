@@ -13,7 +13,7 @@ float getSize(float mag)
   float linear = mag / (faMag - brMag);
   float cubic = pow (linear - 1, 3) + 1;
 
-  float size = mix(linear, cubic, 0.8);
+  float size = mix(linear, cubic, 0.6);
 
-  return 1.5 + a * clamp(1 - size, 0, 1);
+  return 0.5 + a * clamp(1 - size, 0, 1);
 }

@@ -2,6 +2,14 @@
 #include "renderer.h"
 #include "mapparam.h"
 #include "skmath.h"
+#include "debugwidget.h"
+#include "dataresources.h"
+#include "stringutils.h"
+#include "mapobject.h"
+
+#include "tycho.h"
+#include "gsc.h"
+#include "ucac4.h"
 
 #include <QPainter>
 #include <QOpenGLBuffer>
@@ -15,9 +23,9 @@
 
 static QOpenGLDebugLogger *lg;
 
-static MapParam mapParam;
-
 static QImage *m_overlayImage = NULL;
+
+static int gpuTotalMemory;
 
 MapWidget::MapWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
@@ -25,15 +33,6 @@ MapWidget::MapWidget(QWidget *parent) : QOpenGLWidget(parent)
 
   m_width = 0;
   m_height = 0;
-
-  QSurfaceFormat fmt;
-
-  fmt.setSamples(16);
-  fmt.setOption(QSurfaceFormat::DebugContext);
-  fmt.setVersion(2, 1);
-  fmt.setProfile(QSurfaceFormat::CoreProfile);
-
-  setFormat(fmt);
 
   setFocusPolicy(Qt::StrongFocus);
 }
@@ -48,8 +47,6 @@ void MapWidget::initializeGL()
   initializeOpenGLFunctions();
 
   QString versionString(QLatin1String(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-  qDebug() << "Driver Version String:" << versionString;
-  qDebug() << "Current Context:" << format();
 
   QOpenGLContext *ctx = QOpenGLContext::currentContext();
   Q_UNUSED(ctx);
@@ -59,17 +56,16 @@ void MapWidget::initializeGL()
   lg->enableMessages();
   connect(lg, SIGNAL(messageLogged(QOpenGLDebugMessage)), this, SLOT(glLog(QOpenGLDebugMessage)));
 
-  int pp;
-  glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &pp);
-  qDebug() << "freem" << pp;
+  qDebug() << "Driver Version String:" << versionString;
+  qDebug() << "Current Context:" << ctx->format();
+
+  glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &gpuTotalMemory);
+  qDebug() << "total" << gpuTotalMemory;
 
   m_renderer = new Renderer();
   m_renderer->createStaticResources();
 
   m_painterOverlay = new PainterOverlay();
-
-  glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &pp);
-  qDebug() << "freem" << pp;
 }
 
 void MapWidget::resizeGL(int w, int h)
@@ -93,6 +89,10 @@ void MapWidget::resizeGL(int w, int h)
 
 void MapWidget::paintGL()
 {
+  g_debugWidget->reset();
+
+  g_dataResource->getMapObject()->newFrame();
+
   if (m_width < 1 || m_height < 1)
   {
     return;
@@ -103,12 +103,21 @@ void MapWidget::paintGL()
 
   QOpenGLFunctions gl(context());
   m_transform.setGl(&gl);
-  m_transform.setTransform(m_width, m_height, mapParam);
+  m_transform.setTransform(m_width, m_height, *m_transform.getMapParam());
 
 
   glClearColor(0.05, 0.05, 0.1f, 1);
   glClear(GL_COLOR_BUFFER_BIT);
   glEnable(GL_MULTISAMPLE);
+
+  float starPlus = 1;
+  QEasingCurve curve(QEasingCurve::InExpo);
+  m_transform.getMapParam()->m_maxStarMag = starPlus + 5 + 12.0 * curve.valueForProgress(FRAC(m_transform.getMapParam()->m_fov, SkMath::toRad(90), SkMath::toRad(0.5)));
+
+  m_transform.getMapParam()->m_fov = CLAMP(m_transform.getMapParam()->m_fov, SkMath::toRad(0.01), R90);
+
+  //qDebug() << m_transform.getMapParam()->m_maxStarMag;
+  //qDebug() << SkMath::toDeg(m_transform.getMapParam()->m_fov);
 
   m_renderer->render(&m_transform);
 
@@ -131,8 +140,10 @@ void MapWidget::paintGL()
   m_painterOverlay->render(&m_transform, m_overlayImage);
   */
 
-  //qDebug() << time.elapsed() << 1000 / (float)time.elapsed();
+  qDebug() << time.elapsed() << 1000 / (float)time.elapsed() << g_dataResource->getMapObject()->getObjectCount();
   //qDebug() << SkMath::toDeg(mapParam.m_fov);
+
+  writeDebug();
 }
 
 
@@ -158,9 +169,9 @@ void MapWidget::wheelEvent(QWheelEvent *e)
   //i.save("ppp.png", "PNG");
 
   if (e->delta() > 0)
-    mapParam.m_fov *= 0.8;
+    m_transform.getMapParam()->m_fov *= 0.8;
   else
-    mapParam.m_fov *= 1.2;
+    m_transform.getMapParam()->m_fov *= 1.2;
   update();
 }
 
@@ -189,8 +200,8 @@ void MapWidget::mouseMoveEvent(QMouseEvent *e)
     double rad = rd1.ra - rd2.ra;
     double ded = rd1.dec - rd2.dec;
 
-    mapParam.m_x += rad;
-    mapParam.m_y += ded;
+    m_transform.getMapParam()->m_x += rad;
+    m_transform.getMapParam()->m_y += ded;
 
     //rangeDbl(&m_mapView.x, R360);
     //m_mapView.y = CLAMP(m_mapView.y, -R90, R90);
@@ -213,35 +224,50 @@ void MapWidget::keyPressEvent(QKeyEvent *e)
 {
   if (e->key() == Qt::Key_Left)
   {
-    mapParam.m_x -= 0.01;
+    m_transform.getMapParam()->m_x -= 0.01;
   }
   else
   if (e->key() == Qt::Key_Right)
   {
-    mapParam.m_x += 0.01;
+    m_transform.getMapParam()->m_x += 0.01;
   }
   else
   if (e->key() == Qt::Key_Up)
   {
-    mapParam.m_y -= 0.01;
+    m_transform.getMapParam()->m_y -= 0.01;
   }
   else
   if (e->key() == Qt::Key_Down)
   {
-    mapParam.m_y += 0.01;
+    m_transform.getMapParam()->m_y += 0.01;
   }
   else
   if (e->key() == Qt::Key_Insert)
   {
-    mapParam.m_roll -= 0.05;
+    m_transform.getMapParam()->m_roll -= 0.05;
   }
   else
   if (e->key() == Qt::Key_PageUp)
   {
-    mapParam.m_roll += 0.05;
+    m_transform.getMapParam()->m_roll += 0.05;
   }
 
   update();
+}
+
+void MapWidget::writeDebug()
+{
+  int mem;
+  glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &mem);
+  g_debugWidget->addText("GPU Usage", QString("%1 kB").arg(StringUtils::addComma(gpuTotalMemory - mem)));
+
+  g_debugWidget->addText("Tycho", QString("%1 kB").arg(StringUtils::addComma(g_dataResource->getTycho()->getMemoryUsage() / 1024)));
+
+  g_debugWidget->addText("GSC 1.2", QString("%1 kB\nRegions used : %2").arg(StringUtils::addComma(g_dataResource->getGSC()->getMemoryUsage() / 1024)).
+                                                                        arg(StringUtils::addComma(g_dataResource->getGSC()->getRegionUsed())));
+
+  g_debugWidget->addText("UCAC4", QString("%1 kB\nRegions used : %2").arg(StringUtils::addComma(g_dataResource->getUCAC4()->getMemoryUsage() / 1024)).
+                                                                      arg(StringUtils::addComma(g_dataResource->getUCAC4()->getRegionUsed())));
 }
 
 void MapWidget::glLog(QOpenGLDebugMessage msg)

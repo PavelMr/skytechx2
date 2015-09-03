@@ -7,9 +7,15 @@
 #include "textrenderer.h"
 #include "renderer.h"
 #include "starshader.h"
+#include "skmath.h"
+#include "mapobject.h"
 
 #include <QOpenGLShaderProgram>
 #include <QOpenGLDebugLogger>
+#include <QImage>
+
+
+static Vector3 colorTable[256];
 
 static QVector3D colorSP[8] = {QVector3D(255, 255, 255),
                                QVector3D(155, 176, 255),
@@ -26,8 +32,37 @@ LayerTychoStars::LayerTychoStars()
 
 }
 
+static int BvToColorIndex(double b_v) {
+  b_v = CLAMP(b_v, -0.5, 2.0);
+
+  return FRAC(b_v, -0.5, 2.0) * 255;
+}
+
+
+Vector3 bv2rgb(double bv)    // RGB <0,1> <- BV <-0.4,+2.0> [-]
+{
+  int index = BvToColorIndex(bv);
+
+  return colorTable[index];
+}
+
 void LayerTychoStars::createReources()
 {
+  QImage *m_colorIndexImage = new QImage(":/res/stars/colorindex.png");
+  quint32 *data = (quint32 *)m_colorIndexImage->bits();
+
+  for (int i = 0; i < 256; i++)
+  {
+    QColor color = QColor(data[i]);
+
+    colorTable[i].x = color.red() / 255.f;
+    colorTable[i].y = color.green() / 255.f;
+    colorTable[i].z = color.blue() / 255.f;
+
+    //qDebug() << i << color;
+  }
+
+
   starVertex_t *vertex;
   Tycho *tycho = g_dataResource->getTycho();
 
@@ -51,6 +86,7 @@ void LayerTychoStars::createReources()
     for (int i = 0; i < reg->region.numStars; i++)
     {
       float mag = Tycho::getMagnitude(reg->stars[i]);
+
       Vector3 vec;
       Transform::rdToVector(RaDec(reg->stars[i].ra, reg->stars[i].dec), vec);
 
@@ -63,6 +99,12 @@ void LayerTychoStars::createReources()
         if (supp->pnOffs != 0xffff)
         {
           m_textRendererNames.addText(tycho->getStarName(supp), RaDec(reg->stars[i].ra, reg->stars[i].dec), GL_TA_BOTTOM, mag);
+        }
+
+        if (supp->hd == 148478)
+        {
+          int a= 1;
+          a++;
         }
 
         bool    bFlamsteed;
@@ -86,9 +128,14 @@ void LayerTychoStars::createReources()
       vertex[i].y = vec.y;
       vertex[i].z = vec.z;
 
-      vertex[i].colorMagnitude[0] = colorSP[spectralIndex].x() / 255.f;
-      vertex[i].colorMagnitude[1] = colorSP[spectralIndex].y() / 255.f;
-      vertex[i].colorMagnitude[2] = colorSP[spectralIndex].z() / 255.f;
+      float bv = (reg->stars[i].BTmag - reg->stars[i].VTmag) / 1000.0;
+
+      Vector3 col;
+      col = bv2rgb(bv);
+
+      vertex[i].colorMagnitude[0] = col.x;
+      vertex[i].colorMagnitude[1] = col.y;
+      vertex[i].colorMagnitude[2] = col.z;
 
       vertex[i].colorMagnitude[3] = mag;
     }
@@ -115,12 +162,6 @@ void LayerTychoStars::createReources()
 
 void LayerTychoStars::render(Transform *transform, Renderer *renderer)
 {
-  float magMag = 15.5;
-  float starPlus = 5;
-
-  QEasingCurve curve(QEasingCurve::InExpo);
-  magMag = starPlus + 5 + 5.0 * curve.valueForProgress(FRAC(transform->getMapParam()->m_fov, SkMath::toRad(90), SkMath::toRad(0.1)));
-
   Tycho *tycho = g_dataResource->getTycho();
 
   QOpenGLShaderProgram *program = &renderer->getStarShaderProgram()->m_program;
@@ -137,7 +178,7 @@ void LayerTychoStars::render(Transform *transform, Renderer *renderer)
   program->setUniformValue("u_scr_width", 1.f / (float)transform->m_width);
   program->setUniformValue("u_scr_height", 1.f / (float)transform->m_height);
 
-  program->setUniformValue("u_mag_limit", (float)magMag);
+  program->setUniformValue("u_mag_limit", (float)transform->getMapParam()->m_maxStarMag);
   program->setUniformValue("pixel_ratio", (float)transform->m_ratio);
 
   transform->getGl()->glActiveTexture(GL_TEXTURE0);
@@ -155,6 +196,8 @@ void LayerTychoStars::render(Transform *transform, Renderer *renderer)
 
   QList <int> *list = g_dataResource->getGscRegions()->getVisibleRegions();
 
+  float maxMag = transform->getMapParam()->m_maxStarMag;
+
   foreach (int i, *list)
   {
     m_regionGlVertices[i].bind();
@@ -168,6 +211,17 @@ void LayerTychoStars::render(Transform *transform, Renderer *renderer)
     program->setAttributeBuffer(vertexLocation1, GL_FLOAT, 3 * sizeof(float), 4, sizeof(starVertex_t));
 
     transform->getGl()->glDrawArrays(GL_POINTS, 0, tycho->m_region[i].region.numStars);
+
+    tychoStar_t *star = tycho->m_region[i].stars;
+    for (int j = 0; j < tycho->m_region[i].region.numStars; j++, star++)
+    {
+      float mag = tycho->getMagnitude(*star);
+
+      if (mag <= maxMag)
+      {
+        g_dataResource->getMapObject()->addTycho2(i, j, star->ra, star->dec, mag);
+      }
+    }
   }
 
   transform->getGl()->glDisable(GL_BLEND);
@@ -178,11 +232,11 @@ void LayerTychoStars::render(Transform *transform, Renderer *renderer)
   textureHalo->release();
   program->release();
 
-  m_textRendererNames.render(transform, magMag);
+  m_textRendererNames.render(transform, transform->getMapParam()->m_maxStarMag);
 
   if (transform->getMapParam()->m_fov <= SkMath::toRad(60))
-    m_textRendererIdBayer.render(transform, magMag);
+    m_textRendererIdBayer.render(transform, transform->getMapParam()->m_maxStarMag);
 
   if (transform->getMapParam()->m_fov <= SkMath::toRad(40))
-    m_textRendererIdFlm.render(transform, magMag);
+    m_textRendererIdFlm.render(transform, transform->getMapParam()->m_maxStarMag);
 }

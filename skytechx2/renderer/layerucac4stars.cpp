@@ -1,25 +1,28 @@
-#include "layergscstars.h"
-#include "transform.h"
+#include "layerucac4stars.h"
 #include "dataresources.h"
-#include "gscregions.h"
-#include "gsc.h"
-#include "starvertices.h"
-#include "renderer.h"
-#include "starshader.h"
 #include "skmath.h"
+#include "transform.h"
+#include "starshader.h"
+#include "gscregions.h"
+#include "renderer.h"
+#include "starvertices.h"
+#include "mapobject.h"
 
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QDebug>
+#include <QEasingCurve>
 
-LayerGSCStars::LayerGSCStars()
+#include <QCursor>
+
+LayerUCAC4Stars::LayerUCAC4Stars()
 {
 
 }
 
-void LayerGSCStars::render(Transform *transform, Renderer *renderer)
+void LayerUCAC4Stars::render(Transform *transform, Renderer *renderer)
 {
-  GSC *gsc = g_dataResource->getGSC();
+  UCAC4 *ucac4 = g_dataResource->getUCAC4();
 
   QList <int> *list = g_dataResource->getGscRegions()->getVisibleRegions();
 
@@ -53,15 +56,17 @@ void LayerGSCStars::render(Transform *transform, Renderer *renderer)
   transform->getGl()->glEnable(GL_BLEND);
   transform->getGl()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  float maxMag = transform->getMapParam()->m_maxStarMag;
+
   foreach (int i, *list)
   {
-    gscStarRegion_t *region = gsc->getRegion(i);
+    ucac4Region_t *region = ucac4->getRegion(i);
 
     if (region)
     {
       if (!region->m_buffer.isCreated())
       {
-        //qDebug() << "create gsc" << i;
+        //qDebug() << "create ucac4" << i;
         createRegionBuffer(region);
       }
 
@@ -76,6 +81,15 @@ void LayerGSCStars::render(Transform *transform, Renderer *renderer)
       program->setAttributeBuffer(vertexLocation1, GL_FLOAT, 3 * sizeof(float), 4, sizeof(starVertex_t));
 
       transform->getGl()->glDrawArrays(GL_POINTS, 0, region->m_buffer.size() / sizeof(starVertex_t));
+
+      UCAC4_Star_t *star = (UCAC4_Star_t *)region->m_stars.constData();
+      for (int j = 0; j < region->m_stars.count(); j++, star++)
+      {
+        if (star->mag2 <= maxMag)
+        {
+          g_dataResource->getMapObject()->addUCAC4(i, j, star->ra / 1000., star->spd / 1999.9, star->mag2);
+        }
+      }
     }
   }
 
@@ -88,22 +102,24 @@ void LayerGSCStars::render(Transform *transform, Renderer *renderer)
   program->release();
 }
 
-void LayerGSCStars::createRegionBuffer(gscStarRegion_t *region)
+void LayerUCAC4Stars::createRegionBuffer(ucac4Region_t *region)
 {
   QVector <starVertex_t> vertices;
 
   region->m_buffer.create();
   region->m_buffer.bind();
 
-  for (int i = 0; i < region->h.nobj; i++)
+  for (int i = 0; i < region->m_stars.count(); i++)
   {
-    gscStar_t *star = &region->gsc[i];
+    UCAC4_Star_t *star = &region->m_stars[i];
 
-    if (star->pMag >= 11)
+    if (star->mag2 / 1000.0 >= 11)
     {
       starVertex_t data;
       Vector3 vec;
-      Transform::rdToVector(star->rd, vec);
+      Transform::rdToVector(RaDec(SkMath::toRad(star->ra / 3600. / 1000.0),
+                                  SkMath::toRad((star->spd / 3600. / 1000.0) - 90.0)), vec);
+
 
       data.x = vec.x;
       data.y = vec.y;
@@ -113,7 +129,7 @@ void LayerGSCStars::createRegionBuffer(gscStarRegion_t *region)
       data.colorMagnitude[1] = 1;
       data.colorMagnitude[2] = 1;
 
-      data.colorMagnitude[3] = star->pMag;
+      data.colorMagnitude[3] = star->mag2 / 1000.f;
 
       vertices.append(data);
     }

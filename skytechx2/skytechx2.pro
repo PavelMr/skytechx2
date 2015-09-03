@@ -18,6 +18,8 @@ INCLUDEPATH += mainwindow \
                transform \
                gscregions \
                core \
+               mapobject \
+               debug \
                define
 
 SOURCES += main.cpp\
@@ -46,7 +48,12 @@ SOURCES += main.cpp\
     renderer/painteroverlay.cpp \
     catalogue/gsc.cpp \
     renderer/layergscstars.cpp \
-    renderer/starshader.cpp
+    renderer/starshader.cpp \
+    debug/debugwidget.cpp \
+    core/stringutils.cpp \
+    catalogue/ucac4.cpp \
+    renderer/layerucac4stars.cpp \
+    catalogue/dso.cpp
 
 HEADERS  += mainwindow/mainwindow.h \
     mainwindow/sidebar/sidebarquickinfo.h \
@@ -76,11 +83,18 @@ HEADERS  += mainwindow/mainwindow.h \
     renderer/painteroverlay.h \
     catalogue/gsc.h \
     renderer/layergscstars.h \
-    renderer/starshader.h
+    renderer/starshader.h \
+    debug/debugwidget.h \
+    core/stringutils.h \
+    catalogue/ucac4.h \
+    renderer/layerucac4stars.h \
+    catalogue/dso.h \
+    catalogue/dso_def.h
 
 FORMS    += mainwindow/mainwindow.ui \
     mainwindow/sidebar/sidebarquickinfo.ui \
-    mainwindow/sidebar/sidebarmapcontrol.ui
+    mainwindow/sidebar/sidebarmapcontrol.ui \
+    debug/debugwidget.ui
 
 RCC_DIR = res
 

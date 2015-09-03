@@ -6,6 +6,7 @@
 class LayerTychoStars;
 class LayerConstellations;
 class LayerGSCStars;
+class LayerUCAC4Stars;
 
 class StarShader;
 
@@ -25,6 +26,7 @@ public:
 private:
   LayerTychoStars *m_layerTychoStars;
   LayerGSCStars *m_layerGSCStars;
+  LayerUCAC4Stars *m_layerUCAC4Stars;
 
   LayerConstellations *m_layerConstellations;
   LayerGrid *m_layerGrid;

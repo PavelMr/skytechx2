@@ -4,6 +4,7 @@
 #include "mapparam.h"
 #include "vecmath.h"
 #include "plane.h"
+#include "skmath.h"
 
 #include <QMatrix4x4>
 #include <QOpenGLFunctions>
@@ -18,6 +19,10 @@ public:
   {
     ra = r;
     dec = d;
+  }
+  QString toString()
+  {
+    return QString("R.A : %1 Dec : %2").arg(SkMath::toDeg(ra)).arg(SkMath::toDeg(dec));
   }
 
   double ra, dec;

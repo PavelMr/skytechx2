@@ -7,5 +7,6 @@ MapParam::MapParam()
   m_y = 0;
   m_fov = SkMath::toRad(90);
   m_roll = 0;
+  m_maxStarMag = 10;
 }
 

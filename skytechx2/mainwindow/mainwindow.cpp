@@ -27,6 +27,11 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *)
+{
+  QApplication::quit();
+}
+
 void MainWindow::createSideBar()
 {
   m_sideBar = new QDockWidget(tr("Sidebar"));

@@ -3,7 +3,7 @@
 
 #include "transform.h"
 
-#include <QList>
+#include <QVector>
 
 class MapObject
 {
@@ -26,7 +26,8 @@ public:
   MapObject();
   void newFrame();
 
-  void addTycho2(int region, int index, float mag, int radius);
+  void addTycho2(int region, int index, double ra, double dec, float mag);
+  void addUCAC4(int region, int index, double ra, double dec, float mag);
 
   int findNearestObject(Transform *transform, RaDec &pos, MapTypeObject type = ANY);
 
@@ -36,8 +37,12 @@ private:
   qint64 tycho2ToParam(int region, int index);
   void paramToTycho2(qint64 param, int &region, int &index);
 
+  qint64 decode(int a, int b)
+  {
+    return (qint64)a << 32 | (qint64)b;
+  }
 
-  QList <mapObject_t> m_mapList;
+  QVector <mapObject_t> m_mapList;
 };
 
 #endif // MAPOBJECT_H

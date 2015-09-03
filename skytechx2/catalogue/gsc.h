@@ -36,8 +36,9 @@ typedef struct
 {
     gscHeader_t  h;
       gscStar_t *gsc;
-         qint64  timer;
+         qint64  m_timer;
   QOpenGLBuffer  m_buffer;
+            int  m_size;
 } gscStarRegion_t;
 
 class GSC
@@ -46,6 +47,9 @@ public:
   GSC();
 
   gscStarRegion_t *getRegion(int region);
+  int getMemoryUsage();
+  int getRegionUsed();
+  void clearCache();
 
 private:
   bool loadRegion(int index, gscStarRegion_t *region);
@@ -57,6 +61,8 @@ private:
   long m_gscTable[NUM_GSC_REGS];
 
   char m_tmp[512];
+
+  int m_memoryUsage;
 };
 
 #endif // GSC_H

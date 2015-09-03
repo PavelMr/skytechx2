@@ -104,6 +104,10 @@ QString Tycho::getBayerString(tychoSupp_t *supp, bool &found)
   return(str);
 }
 
+int Tycho::getMemoryUsage()
+{
+  return m_head.numStars * sizeof(tychoStar_t);
+}
 
 
 QString Tycho::getFlamsteedString(tychoSupp_t *supp, bool &found)
@@ -138,8 +142,4 @@ QString Tycho::getStarName(tychoSupp_t *supp)
 }
 
 
-
-float Tycho::getMagnitude(tychoStar_t &s)
-{
-  return TYC_SHORT_TO_MAG(s.BTmag);//0.850 * (TYC_SHORT_TO_MAG(s.BTmag) - TYC_SHORT_TO_MAG(s.VTmag));
-}
+//float Tycho::getMagnitude(tychoStar_t &s)
