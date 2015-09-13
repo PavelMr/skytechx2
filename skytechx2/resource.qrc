@@ -21,5 +21,7 @@
         <file>res/opengl/overlay2d_fshader.glsl</file>
         <file>res/opengl/overlay2d_vshader.glsl</file>
         <file>res/stars/colorindex.png</file>
+        <file>res/opengl/bk_fshader.glsl</file>
+        <file>res/opengl/bk_vshader.glsl</file>
     </qresource>
 </RCC>

@@ -13,6 +13,7 @@ public:
   double m_y;
   double m_roll;
   double m_maxStarMag;
+  double m_starMagAdd;
 };
 
 #endif // MAPPARAM_H

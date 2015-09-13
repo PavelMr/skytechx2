@@ -7,6 +7,7 @@ class LayerTychoStars;
 class LayerConstellations;
 class LayerGSCStars;
 class LayerUCAC4Stars;
+class LayerBackground;
 
 class StarShader;
 
@@ -30,6 +31,8 @@ private:
 
   LayerConstellations *m_layerConstellations;
   LayerGrid *m_layerGrid;
+
+  LayerBackground *m_background;
 
   StarShader *m_starShader;
 

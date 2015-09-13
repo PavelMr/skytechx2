@@ -82,6 +82,7 @@ void LayerUCAC4Stars::render(Transform *transform, Renderer *renderer)
 
       transform->getGl()->glDrawArrays(GL_POINTS, 0, region->m_buffer.size() / sizeof(starVertex_t));
 
+      /*
       UCAC4_Star_t *star = (UCAC4_Star_t *)region->m_stars.constData();
       for (int j = 0; j < region->m_stars.count(); j++, star++)
       {
@@ -90,6 +91,7 @@ void LayerUCAC4Stars::render(Transform *transform, Renderer *renderer)
           g_dataResource->getMapObject()->addUCAC4(i, j, star->ra / 1000., star->spd / 1999.9, star->mag2);
         }
       }
+      */
     }
   }
 

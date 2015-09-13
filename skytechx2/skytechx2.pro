@@ -53,7 +53,9 @@ SOURCES += main.cpp\
     core/stringutils.cpp \
     catalogue/ucac4.cpp \
     renderer/layerucac4stars.cpp \
-    catalogue/dso.cpp
+    catalogue/dso.cpp \
+    renderer/layerbackground.cpp \
+    core/skstring.cpp
 
 HEADERS  += mainwindow/mainwindow.h \
     mainwindow/sidebar/sidebarquickinfo.h \
@@ -89,7 +91,9 @@ HEADERS  += mainwindow/mainwindow.h \
     catalogue/ucac4.h \
     renderer/layerucac4stars.h \
     catalogue/dso.h \
-    catalogue/dso_def.h
+    catalogue/dso_def.h \
+    renderer/layerbackground.h \
+    core/skstring.h
 
 FORMS    += mainwindow/mainwindow.ui \
     mainwindow/sidebar/sidebarquickinfo.ui \
@@ -100,3 +104,5 @@ RCC_DIR = res
 
 RESOURCES += \
     resource.qrc
+
+DISTFILES +=

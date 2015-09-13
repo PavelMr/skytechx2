@@ -6,7 +6,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-#define MAX_GRID_POINTS           4000
+#define MAX_GRID_POINTS           6000
 
 typedef struct
 {

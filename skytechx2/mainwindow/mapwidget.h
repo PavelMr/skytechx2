@@ -17,6 +17,8 @@ public:
   explicit MapWidget(QWidget *parent = 0);
   ~MapWidget();
 
+  void addStarMagnitude(double add);
+
 protected:
   void initializeGL() Q_DECL_OVERRIDE;
   void resizeGL(int w, int h) Q_DECL_OVERRIDE;

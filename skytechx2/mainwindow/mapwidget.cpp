@@ -110,7 +110,7 @@ void MapWidget::paintGL()
   glClear(GL_COLOR_BUFFER_BIT);
   glEnable(GL_MULTISAMPLE);
 
-  float starPlus = 1;
+  double starPlus = m_transform.getMapParam()->m_starMagAdd;
   QEasingCurve curve(QEasingCurve::InExpo);
   m_transform.getMapParam()->m_maxStarMag = starPlus + 5 + 12.0 * curve.valueForProgress(FRAC(m_transform.getMapParam()->m_fov, SkMath::toRad(90), SkMath::toRad(0.5)));
 
@@ -121,9 +121,9 @@ void MapWidget::paintGL()
 
   m_renderer->render(&m_transform);
 
+  /*
   QPainter p;
 
-  /*
   m_overlayImage->fill(Qt::transparent);
 
   static int a = 100;
@@ -140,7 +140,8 @@ void MapWidget::paintGL()
   m_painterOverlay->render(&m_transform, m_overlayImage);
   */
 
-  qDebug() << time.elapsed() << 1000 / (float)time.elapsed() << g_dataResource->getMapObject()->getObjectCount();
+
+  //qDebug() << time.elapsed() << 1000 / (float)time.elapsed() << g_dataResource->getMapObject()->getObjectCount();
   //qDebug() << SkMath::toDeg(mapParam.m_fov);
 
   writeDebug();
@@ -180,9 +181,12 @@ void MapWidget::mousePressEvent(QMouseEvent *e)
 {
   m_lastPoint = e->pos();
 
-  double ra, dec;
-
-  m_transform.XYToRaDec(e->pos().x(), e->pos().y(), ra, dec);
+  if (e->buttons() & Qt::RightButton)
+  {
+    double ra, dec;
+    m_transform.XYToRaDec(e->pos().x(), e->pos().y(), ra, dec);
+    g_dataResource->getMapObject()->objList(RaDec(ra, dec), &m_transform);
+  }
 
   //qDebug() << SkMath::toDeg(ra) << SkMath::toDeg(dec);
 }
@@ -252,6 +256,12 @@ void MapWidget::keyPressEvent(QKeyEvent *e)
     m_transform.getMapParam()->m_roll += 0.05;
   }
 
+  update();
+}
+
+void MapWidget::addStarMagnitude(double add)
+{
+   m_transform.getMapParam()->m_starMagAdd += add;
   update();
 }
 

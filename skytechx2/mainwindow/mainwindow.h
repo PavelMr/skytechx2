@@ -25,6 +25,11 @@ public:
 protected:
   void closeEvent(QCloseEvent *e);
 
+private slots:
+  void on_actionIncrease_star_magnitude_triggered();
+
+  void on_actionDecrease_star_magnitude_triggered();
+
 private:
   Ui::MainWindow *ui;
 

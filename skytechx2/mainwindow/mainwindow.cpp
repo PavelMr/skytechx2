@@ -49,3 +49,13 @@ void MainWindow::createSideBar()
   m_sideBarToolBox->addItem(m_sideBarQuickInfo, tr("Quick information"));
   m_sideBarToolBox->addItem(m_sideBarMapControl, tr("Map control"));
 }
+
+void MainWindow::on_actionIncrease_star_magnitude_triggered()
+{
+  m_mapWidget->addStarMagnitude(0.5);
+}
+
+void MainWindow::on_actionDecrease_star_magnitude_triggered()
+{
+  m_mapWidget->addStarMagnitude(-0.5);
+}

@@ -192,6 +192,7 @@ int LayerGrid::generateGrid(Transform *transform, QMatrix4x4 &matrix, int type)
 
           if (count >= MAX_GRID_POINTS)
           {
+            qDebug() << "MAX_GRID_POINTS" << count;
             return count;
           }
 
@@ -199,6 +200,8 @@ int LayerGrid::generateGrid(Transform *transform, QMatrix4x4 &matrix, int type)
       }
     }
   }
+
+  //qDebug() << count;
 
   return count;
 }

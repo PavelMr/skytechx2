@@ -13,6 +13,34 @@ static const char greekChar[25] = {'a','b','g','d','e','z','h','J','i','k',
                                    'l','m','n','x','o','p','r','s','t','u',
                                    'j','c','y','w','?'};
 
+static const QString greekStr[25] = { "Alpha",
+                                      "Beta",
+                                      "Gamma",
+                                      "Delta",
+                                      "Epsilon",
+                                      "Dzeta",
+                                      "Eta",
+                                      "Theta",
+                                      "Iota",
+                                      "Kappa",
+                                      "Lambda",
+                                      "Mu",
+                                      "Nu",
+                                      "Xi",
+                                      "Omicron",
+                                      "Pi",
+                                      "Rho",
+                                      "Sigma",
+                                      "Tau",
+                                      "Upsilon",
+                                      "Phi",
+                                      "Chi",
+                                      "Psi",
+                                      "Omega",
+                                      "???"
+                                     };
+
+
 
 Tycho::Tycho()
 {
@@ -99,6 +127,23 @@ QString Tycho::getBayerString(tychoSupp_t *supp, bool &found)
 
   if (supp->ba[1] != 0)
     str += supp->ba[1] + '0';
+
+  found = true;
+  return(str);
+}
+
+QString Tycho::getBayerString2(tychoSupp_t *supp, bool &found)
+{
+  if (supp->ba[0] == 0)
+  {
+    found = false;
+    return("");
+  }
+
+  QString str = QString((greekStr[supp->ba[0] - 1]));
+
+  if (supp->ba[1] != 0)
+    str += QString(" %1").arg(supp->ba[1]);
 
   found = true;
   return(str);

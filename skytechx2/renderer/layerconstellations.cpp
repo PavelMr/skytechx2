@@ -139,6 +139,7 @@ void LayerConstellations::createResourcesBoundaries()
 
      if (pCon->p)
      {
+       // TODO: stejnou dec interpolovat
        lineVertex_t v1, v2;
        Vector3 vec;
 

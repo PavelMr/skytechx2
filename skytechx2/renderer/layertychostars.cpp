@@ -212,16 +212,7 @@ void LayerTychoStars::render(Transform *transform, Renderer *renderer)
 
     transform->getGl()->glDrawArrays(GL_POINTS, 0, tycho->m_region[i].region.numStars);
 
-    tychoStar_t *star = tycho->m_region[i].stars;
-    for (int j = 0; j < tycho->m_region[i].region.numStars; j++, star++)
-    {
-      float mag = tycho->getMagnitude(*star);
-
-      if (mag <= maxMag)
-      {
-        g_dataResource->getMapObject()->addTycho2(i, j, star->ra, star->dec, mag);
-      }
-    }
+    g_dataResource->getMapObject()->addRegion(i);
   }
 
   transform->getGl()->glDisable(GL_BLEND);

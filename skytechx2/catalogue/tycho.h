@@ -87,6 +87,7 @@ class Tycho : public QObject
     QString getStarName(tychoSupp_t *supp);
     QString getFlamsteedString(tychoSupp_t *supp, bool &found);
     QString getBayerString(tychoSupp_t *supp, bool &found);
+    QString getBayerString2(tychoSupp_t *supp, bool &found);
 
     int getMemoryUsage();
 

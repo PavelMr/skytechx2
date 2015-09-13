@@ -9,7 +9,7 @@
 #include "gscregions.h"
 #include "skfile.h"
 #include "starshader.h"
-
+#include "layerbackground.h"
 
 #include <QDebug>
 
@@ -81,11 +81,16 @@ void Renderer::createStaticResources()
 
   m_starShader = new StarShader();
   m_starShader->createResources();
+
+  m_background = new LayerBackground();
+  m_background->createResources();
 }
 
 void Renderer::render(Transform *transform)
 {
   g_dataResource->getGscRegions()->checkVisibleRegions(transform->getFrustum());
+
+  m_background->render(transform);
 
   m_layerGrid->render(transform);
   m_layerConstellations->render(transform);

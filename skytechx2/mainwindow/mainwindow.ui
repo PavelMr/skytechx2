@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
-    <height>543</height>
+    <width>1208</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>588</width>
+     <width>1208</width>
      <height>21</height>
     </rect>
    </property>
@@ -31,8 +31,26 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionIncrease_star_magnitude"/>
+   <addaction name="actionDecrease_star_magnitude"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionIncrease_star_magnitude">
+   <property name="text">
+    <string>Increase star magnitude</string>
+   </property>
+   <property name="toolTip">
+    <string>Show more stars</string>
+   </property>
+  </action>
+  <action name="actionDecrease_star_magnitude">
+   <property name="text">
+    <string>Decrease star magnitude</string>
+   </property>
+   <property name="toolTip">
+    <string>Show less stars</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
