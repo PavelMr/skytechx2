@@ -2,6 +2,7 @@
 #include "tycho.h"
 #include "gsc.h"
 #include "ucac4.h"
+#include "dso.h"
 #include "constellations.h"
 #include "gscregions.h"
 #include "mapobject.h"
@@ -23,6 +24,9 @@ DataResources::DataResources() :
   m_gscRegion = new GscRegion(4);
   m_gscRegion->loadRegions();
 
+  m_dso = new DSO();
+  m_dso->load();
+
   m_mapObject = new MapObject();
 }
 
@@ -39,6 +43,11 @@ GSC *DataResources::getGSC()
 UCAC4 *DataResources::getUCAC4()
 {
   return m_ucac4;
+}
+
+DSO *DataResources::getDSO()
+{
+  return m_dso;
 }
 
 Constellations *DataResources::getConstellations()

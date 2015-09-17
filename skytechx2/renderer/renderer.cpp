@@ -4,6 +4,7 @@
 #include "layerucac4stars.h"
 #include "layerconstellations.h"
 #include "layergrid.h"
+#include "layerdso.h"
 #include "transform.h"
 #include "dataresources.h"
 #include "gscregions.h"
@@ -82,6 +83,9 @@ void Renderer::createStaticResources()
   m_starShader = new StarShader();
   m_starShader->createResources();
 
+  m_layerDSO = new LayerDSO();
+  m_layerDSO->createResources();
+
   m_background = new LayerBackground();
   m_background->createResources();
 }
@@ -92,12 +96,15 @@ void Renderer::render(Transform *transform)
 
   m_background->render(transform);
 
+  m_layerDSO->render(transform);
+
   m_layerGrid->render(transform);
+
   m_layerConstellations->render(transform);
 
   if (transform->getMapParam()->m_fov <= SkMath::toRad(15))
   {
-    //m_layerGSCStars->render(transform, this);
+    m_layerGSCStars->render(transform, this);
   }
 
   if (transform->getMapParam()->m_fov <= SkMath::toRad(10))

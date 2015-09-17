@@ -14,6 +14,7 @@ layout(triangle_strip, max_vertices = 8) out;
 
 in vec4 v_color[];
 in float v_size[];
+in float v_pos[];
 
 out vec4 f_color;
 out vec2 f_uv;
@@ -39,42 +40,29 @@ void main()
   p[2] = vec4(-1, -1, 0, 0);
   p[3] = vec4(1, -1, 0, 0);
 
-  /*
-  for (int i = 0; i < 4; i++)
-  {
-    float x, y;
-    float s = sin(P.x);
-    float c = cos(P.x);
-
-    x = p[i].x * c - p[i].y * s;
-    y = p[i].x * s + p[i].y * c;
-
-    p[i].x = x;
-    p[i].y = y;
-  }
-  */
+  vec4 color = v_color[0];
 
   gl_Position = P + p[0] * scale;
   f_uv = vec2(0, 0);
-  f_color = v_color[0];
+  f_color = color;
   f_texture = 0;
   EmitVertex();
 
   gl_Position = P + p[1] * scale;
   f_uv = vec2(1, 0);
-  f_color = v_color[0];
+  f_color = color;
   f_texture = 0;
   EmitVertex();
 
   gl_Position = P + p[2] * scale;
   f_uv = vec2(0, 1);
-  f_color = v_color[0];
+  f_color = color;
   f_texture = 0;
   EmitVertex();
 
   gl_Position = P + p[3] * scale;
   f_uv = vec2(1 ,1);
-  f_color = v_color[0];
+  f_color = color;
   f_texture = 0;
   EmitVertex();
 

@@ -9,7 +9,6 @@ QOpenGLTexture *m_texture;
 
 LayerBackground::LayerBackground()
 {
-
 }
 
 void LayerBackground::createResources()
@@ -45,20 +44,38 @@ void LayerBackground::createResources()
   m_texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
   m_texture->allocateStorage();
 
-  QImage img_pX = QImage("resources/milkyway/milkyway2_outright.png");
+
+  QImage img_pX = QImage("resources/milkyway/milkyway_outright.png");
   m_texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_pX.bits());
-  QImage img_nX = QImage("resources/milkyway/milkyway2_outleft.png");
+  QImage img_nX = QImage("resources/milkyway/milkyway_outleft.png");
   m_texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeX, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_nX.bits());
 
-  QImage img_pZ = QImage("resources/milkyway/milkyway2_outtop.png");
+  QImage img_pZ = QImage("resources/milkyway/milkyway_outtop.png");
   m_texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveY, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_pZ.bits());
-  QImage img_nZ = QImage("resources/milkyway/milkyway2_outbottom.png");
+  QImage img_nZ = QImage("resources/milkyway/milkyway_outbottom.png");
   m_texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeY, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_nZ.bits());
 
-  QImage img_pY = QImage("resources/milkyway/milkyway2_outfront.png");
+  QImage img_pY = QImage("resources/milkyway/milkyway_outfront.png");
   m_texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveZ, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_pY.bits());
-  QImage img_nY = QImage("resources/milkyway/milkyway2_outback.png");
+  QImage img_nY = QImage("resources/milkyway/milkyway_outback.png");
   m_texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeZ, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_nY.bits());
+
+  /*
+  QImage img_pX = QImage("resources/milkyway/1024/mw_360_out_outright.png");
+  m_texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_pX.bits());
+  QImage img_nX = QImage("resources/milkyway/1024/mw_360_out_outleft.png");
+  m_texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeX, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_nX.bits());
+
+  QImage img_pZ = QImage("resources/milkyway/1024/mw_360_out_outtop.png");
+  m_texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveY, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_pZ.bits());
+  QImage img_nZ = QImage("resources/milkyway/1024/mw_360_out_outbottom.png");
+  m_texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeY, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_nZ.bits());
+
+  QImage img_pY = QImage("resources/milkyway/1024/mw_360_out_outfront.png");
+  m_texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveZ, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_pY.bits());
+  QImage img_nY = QImage("resources/milkyway/1024/mw_360_out_outback.png");
+  m_texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeZ, QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, img_nY.bits());
+  */
 
   m_texture->setWrapMode(QOpenGLTexture::ClampToEdge);
 

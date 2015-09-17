@@ -8,6 +8,7 @@ in vec4 a_colorMagnitude;
 
 out vec4 v_color;
 out float v_size;
+out float v_pos;
 
 #pragma include ":/res/opengl/common.glsl"
 
@@ -16,5 +17,6 @@ void main()
   v_size = getSize(a_colorMagnitude.w);
   v_color = vec4(a_colorMagnitude.rgb, 1.0);
   gl_Position = mvp_matrix * a_position;
+  v_pos = a_position.y;
 }
 

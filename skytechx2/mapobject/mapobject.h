@@ -9,8 +9,10 @@
 
 enum MOType
 {
-  TYCHO_STAR = 0,
-  UCAC4_STAR = 1,
+  DSO_OBJECT = 0,
+  TYCHO_STAR = 1,
+  GSC_STAR   = 2,
+  UCAC4_STAR = 3,
 };
 
 typedef struct
@@ -30,10 +32,12 @@ public:
   void newFrame();
 
   void addRegion(int region);
+  void addDSO(int index);
   void objList(const RaDec pos, Transform *transform);
 
 private:
   QVector <int> m_regionList;
+  QVector <int> m_dsoList;
 };
 
 #endif // MAPOBJECT_H

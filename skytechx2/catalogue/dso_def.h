@@ -1,9 +1,11 @@
 #ifndef DSO_DEF_H
 #define DSO_DEF_H
 
+#include "skmath.h"
 #include "transform.h"
 
 #include <QtGlobal>
+#include <QString>
 
 #define NO_DSO_MAG           0x7fff
 #define NO_DSO_PA            0xffff
@@ -35,12 +37,16 @@
 #define DSOT_MILKY_SC        17
 #define DSOT_GAL_CLUSTER     18
 
-#define DSOT_NGC_DUPP            20  // NGC/IC duplicate
+#define DSOT_NGC_DUPP        20  // NGC/IC duplicate
 
 #define DSOT_OTHER           30
 #define DSOT_COUNT           31
 
-#define DSO_MAG              mag / 100.0
+#define DSOT_CUSTOM_FLAG     0x80
+
+#define USER_OFFSET       1000000
+
+#define DSO_MAG(mag)       ((mag) / 100.0)
 
 typedef struct
 {

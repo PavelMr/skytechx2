@@ -1,20 +1,26 @@
 #include "mapobject.h"
 #include "tycho.h"
 #include "ucac4.h"
+#include "gsc.h"
+#include "dso.h"
 #include "dataresources.h"
 #include "skstring.h"
+#include "xmlsetting.h"
 
 #include <QMenu>
 #include <QDebug>
 
+extern XmlSetting g_systemSetting;
+
+
 MapObject::MapObject()
 {
-
 }
 
 void MapObject::newFrame()
 {
   m_regionList.clear();
+  m_dsoList.clear();
 }
 
 
@@ -23,11 +29,21 @@ void MapObject::addRegion(int region)
   m_regionList.append(region);
 }
 
+void MapObject::addDSO(int index)
+{
+  m_dsoList.append(index);
+}
+
 static bool mapObjectSort(const mapObject_t &a, const mapObject_t &b)
 {
   if (a.type < b.type)
   {
     return true;
+  }
+
+  if (a.type > b.type)
+  {
+    return false;
   }
 
   return a.magnitude < b.magnitude;
@@ -40,9 +56,10 @@ void MapObject::objList(const RaDec pos, Transform *transform)
 
   Tycho *tycho = g_dataResource->getTycho();
   UCAC4 *ucac4 = g_dataResource->getUCAC4();
+  GSC *gsc = g_dataResource->getGSC();
 
   double maxStarMag = transform->getMapParam()->m_maxStarMag;
-  double angDistance = transform->m_fov / 100.0;
+  double angDistance = transform->m_fov * g_systemSetting("picking_fov_multiplicator").toDouble();
 
   //qDebug() << "--------------------";
 
@@ -96,8 +113,33 @@ void MapObject::objList(const RaDec pos, Transform *transform)
     }
 
     if (transform->getMapParam()->m_fov <= SkMath::toRad(10))
-    {
-      // ucac4 //////////////////////////////////////////
+    { // GSC ////////////////////////////////////////////
+      gscStarRegion_t *gscRegion = gsc->getRegion(i);
+
+      for (int j = 0; j < gscRegion->h.nobj ; j++)
+      {
+        gscStar_t *star = &gscRegion->gsc[j];
+
+        if (star->pMag > maxStarMag || (star->pMag < 11))
+        {
+          continue;
+        }
+
+        if (SkMath::distance(pos.ra, pos.dec, star->rd.ra, star->rd.dec) <= angDistance)
+        {
+          mapObject.label = QString("GSC %1-%2").arg(star->reg).arg(star->id);
+          mapObject.magnitude = star->pMag;
+          mapObject.type = GSC_STAR;
+          mapObject.param1 = i; // region
+          mapObject.param2 = j; // index in region
+
+          list.append(mapObject);
+        }
+      }
+    }
+
+    if (transform->getMapParam()->m_fov <= SkMath::toRad(10))
+    { // ucac4 //////////////////////////////////////////
       ucac4Region_t *ucac4region = ucac4->getRegion(i);
 
       for (int j = 0; j < ucac4region->m_stars.count(); j++)
@@ -113,7 +155,7 @@ void MapObject::objList(const RaDec pos, Transform *transform)
         {
           //qDebug() << star->id_number << (star->mag2 / 1000.);
 
-          mapObject.label = "UCAC4 " + QString::number(star->id_number);
+          mapObject.label = QString("UCAC4 %1-%2").arg(star->ucac4_zone).arg(star->ucac4_number);
           mapObject.magnitude = star->mag2 / 1000.0;
           mapObject.type = UCAC4_STAR;
           mapObject.param1 = i; // region
@@ -123,7 +165,28 @@ void MapObject::objList(const RaDec pos, Transform *transform)
         }
       }
     }
+  }
 
+  foreach (int index, m_dsoList)
+  {
+    dso_t *dso = &g_dataResource->getDSO()->m_dso[index];
+    double distance = SkMath::toRad(dso->sx / 3600.) * 0.6;
+
+    if (distance < angDistance)
+    {
+      distance = angDistance;
+    }
+
+    if (SkMath::distance(pos.ra, pos.dec, dso->rd.ra, dso->rd.dec) <= distance)
+    {
+      mapObject.label = g_dataResource->getDSO()->getObjectName(index);
+      mapObject.magnitude = dso->mag / 100.0;
+      mapObject.type = DSO_OBJECT;
+      mapObject.param1 = index; // index
+      mapObject.param2 = 0;
+
+      list.append(mapObject);
+    }
   }
 
   qSort(list.begin(), list.end(), mapObjectSort);

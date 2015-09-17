@@ -12,12 +12,43 @@
 #include <QOpenGLTexture>
 #include <QDebug>
 #include <QEasingCurve>
+#include <QColor>
 
 #include <QCursor>
 
+static Vector3 colorTable[256];
+
+static int BvToColorIndex(double b_v) {
+  b_v = CLAMP(b_v, -0.5, 2.0);
+
+  return FRAC(b_v, -0.5, 2.0) * 255;
+}
+
+
+static Vector3 bv2rgb(double bv)    // RGB <0,1> <- BV <-0.4,+2.0> [-]
+{
+  int index = BvToColorIndex(bv);
+
+  return colorTable[index];
+}
+
 LayerUCAC4Stars::LayerUCAC4Stars()
 {
+  QImage *m_colorIndexImage = new QImage(":/res/stars/colorindex.png");
+  quint32 *data = (quint32 *)m_colorIndexImage->bits();
 
+  for (int i = 0; i < 256; i++)
+  {
+    QColor color = QColor(data[i]);
+
+    colorTable[i].x = color.red() / 255.f;
+    colorTable[i].y = color.green() / 255.f;
+    colorTable[i].z = color.blue() / 255.f;
+
+    //qDebug() << i << color;
+  }
+
+  delete m_colorIndexImage;
 }
 
 void LayerUCAC4Stars::render(Transform *transform, Renderer *renderer)
@@ -127,9 +158,23 @@ void LayerUCAC4Stars::createRegionBuffer(ucac4Region_t *region)
       data.y = vec.y;
       data.z = vec.z;
 
-      data.colorMagnitude[0] = 1;
-      data.colorMagnitude[1] = 1;
-      data.colorMagnitude[2] = 1;
+      int b = star->apass_mag[1];
+      int v = star->apass_mag[2];
+      if (b < 30000 && v < 30000)
+      {
+        double bv = (b - v) / 1000.0;
+        Vector3 col = bv2rgb(bv);
+
+        data.colorMagnitude[0] = col.x;
+        data.colorMagnitude[1] = col.y;
+        data.colorMagnitude[2] = col.z;
+      }
+      else
+      {
+        data.colorMagnitude[0] = 1;
+        data.colorMagnitude[1] = 0;
+        data.colorMagnitude[2] = 0;
+      }
 
       data.colorMagnitude[3] = star->mag2 / 1000.f;
 

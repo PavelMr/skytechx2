@@ -36,8 +36,8 @@ typedef struct
   unsigned char leda_flag;          /* LEDA galaxy match flag */
   unsigned char twomass_ext_flag;   /* 2MASS extended source flag */
   unsigned int id_number;
-  unsigned short ucac2_zone;
-  unsigned int ucac2_number;
+  unsigned short ucac4_zone;        // original ucac2 zone
+  unsigned int ucac4_number;        // original ucac2 number
 } UCAC4_Star_t;
 
 #pragma pack()

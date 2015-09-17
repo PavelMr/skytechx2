@@ -9,5 +9,7 @@ MapParam::MapParam()
   m_roll = 0;
   m_maxStarMag = 10;
   m_starMagAdd = 0;
+  m_flipX = false;
+  m_flipY = false;
 }
 

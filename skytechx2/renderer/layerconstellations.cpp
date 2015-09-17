@@ -94,7 +94,7 @@ void LayerConstellations::createResourcesLines()
 
   // programs
 
-  // Compile vertex shader
+  // Compile verte  x shader
   m_lineProgram.addShaderFromSourceCode(QOpenGLShader::Vertex, Renderer::readShader(":/res/opengl/const_line_vshader.glsl"));
   // Compile fragment shader
   m_lineProgram.addShaderFromSourceCode(QOpenGLShader::Fragment, Renderer::readShader(":/res/opengl/const_line_fshader.glsl"));
@@ -175,7 +175,7 @@ void LayerConstellations::createResourcesNames()
 {
   Constellations *constellation = g_dataResource->getConstellations();
 
-  m_namesRenderer.createTexture("const_name" ,256, "arial", 12);
+  m_namesRenderer.createTexture("const_name" ,256, "arial", 12, Qt::yellow);
 
   for (int i = 0; i < 88; i++)
   {

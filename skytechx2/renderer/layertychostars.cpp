@@ -39,7 +39,7 @@ static int BvToColorIndex(double b_v) {
 }
 
 
-Vector3 bv2rgb(double bv)    // RGB <0,1> <- BV <-0.4,+2.0> [-]
+static Vector3 bv2rgb(double bv)    // RGB <0,1> <- BV <-0.4,+2.0> [-]
 {
   int index = BvToColorIndex(bv);
 
@@ -61,6 +61,7 @@ void LayerTychoStars::createReources()
 
     //qDebug() << i << color;
   }
+  delete m_colorIndexImage;
 
 
   starVertex_t *vertex;
@@ -68,9 +69,9 @@ void LayerTychoStars::createReources()
 
   m_regionGlVertices = new QOpenGLBuffer[tycho->m_head.regCount];
 
-  m_textRendererNames.createTexture("names", 512, "arial", 12, QVector4D(0, 1, 0, 1));
-  m_textRendererIdFlm.createTexture("flm", 256, "Arial", 9, QVector4D(0, 1, 1, 1));
-  m_textRendererIdBayer.createTexture("bayer", 256, "Symbol", 12, QVector4D(0, 1, 1, 1));
+  m_textRendererNames.createTexture("names", 512, "arial", 12, Qt::white);
+  m_textRendererIdFlm.createTexture("flm", 256, "Arial", 9, Qt::green);
+  m_textRendererIdBayer.createTexture("bayer", 256, "Symbol", 12, Qt::yellow);
 
   int maxx = 0;
 
@@ -230,4 +231,5 @@ void LayerTychoStars::render(Transform *transform, Renderer *renderer)
 
   if (transform->getMapParam()->m_fov <= SkMath::toRad(40))
     m_textRendererIdFlm.render(transform, transform->getMapParam()->m_maxStarMag);
+
 }

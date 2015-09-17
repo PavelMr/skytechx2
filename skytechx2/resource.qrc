@@ -23,5 +23,7 @@
         <file>res/stars/colorindex.png</file>
         <file>res/opengl/bk_fshader.glsl</file>
         <file>res/opengl/bk_vshader.glsl</file>
+        <file>res/opengl/dtext_fshader.glsl</file>
+        <file>res/opengl/dtext_vshader.glsl</file>
     </qresource>
 </RCC>

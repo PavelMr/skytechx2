@@ -4,8 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core gui
-QT += widgets opengl
+QT += core gui xml widgets opengl script
 
 TARGET = skytechx2
 TEMPLATE = app
@@ -20,6 +19,7 @@ INCLUDEPATH += mainwindow \
                core \
                mapobject \
                debug \
+               xmlsettings \
                define
 
 SOURCES += main.cpp\
@@ -55,7 +55,10 @@ SOURCES += main.cpp\
     renderer/layerucac4stars.cpp \
     catalogue/dso.cpp \
     renderer/layerbackground.cpp \
-    core/skstring.cpp
+    core/skstring.cpp \
+    xmlsettings/xmlsetting.cpp \
+    renderer/layerdso.cpp \
+    renderer/dynamictextrenderer.cpp
 
 HEADERS  += mainwindow/mainwindow.h \
     mainwindow/sidebar/sidebarquickinfo.h \
@@ -93,7 +96,10 @@ HEADERS  += mainwindow/mainwindow.h \
     catalogue/dso.h \
     catalogue/dso_def.h \
     renderer/layerbackground.h \
-    core/skstring.h
+    core/skstring.h \
+    xmlsettings/xmlsetting.h \
+    renderer/layerdso.h \
+    renderer/dynamictextrenderer.h
 
 FORMS    += mainwindow/mainwindow.ui \
     mainwindow/sidebar/sidebarquickinfo.ui \

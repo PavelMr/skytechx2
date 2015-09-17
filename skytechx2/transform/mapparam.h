@@ -14,6 +14,8 @@ public:
   double m_roll;
   double m_maxStarMag;
   double m_starMagAdd;
+  bool   m_flipX;
+  bool   m_flipY;
 };
 
 #endif // MAPPARAM_H

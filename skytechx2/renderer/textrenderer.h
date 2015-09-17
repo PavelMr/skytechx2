@@ -4,9 +4,10 @@
 #include "transform.h"
 #include "skmath.h"
 
-#include "QOpenGLBuffer"
-#include "QOpenGLShaderProgram"
-#include "QOpenGLTexture"
+#include <QOpenGLBuffer>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+#include <QColor>
 
 #define GL_TA_CENTER        0
 #define GL_TA_BOTTOM        1
@@ -33,7 +34,7 @@ class TextRenderer
 {
 public:
   TextRenderer();
-  void createTexture(QString objName, int size, QString fontName, int fontSize, QVector4D color = QVector4D(1,1,1,1));
+  void createTexture(QString objName, int size, QString fontName, int fontSize, QColor color = Qt::white);
   void addText(const QString &text, const RaDec &rd, int align = GL_TA_CENTER, float mag = NO_MAG_LIMIT);
   void createResources();
   void render(Transform *transform, float magLimit = MAX_MAG_LIMIT);
@@ -49,7 +50,7 @@ private:
   QString m_fontName;
   int m_fontSize;
 
-  QVector4D m_color;
+  QColor m_color;
 
   QList <texts_t> m_texts;
 

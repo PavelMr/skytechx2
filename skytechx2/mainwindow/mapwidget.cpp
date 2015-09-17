@@ -25,7 +25,7 @@ static QOpenGLDebugLogger *lg;
 
 static QImage *m_overlayImage = NULL;
 
-static int gpuTotalMemory;
+//static int gpuTotalMemory;
 
 MapWidget::MapWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
@@ -59,13 +59,13 @@ void MapWidget::initializeGL()
   qDebug() << "Driver Version String:" << versionString;
   qDebug() << "Current Context:" << ctx->format();
 
-  glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &gpuTotalMemory);
-  qDebug() << "total" << gpuTotalMemory;
+  //glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &gpuTotalMemory);
+  //qDebug() << "total" << gpuTotalMemory;
 
   m_renderer = new Renderer();
   m_renderer->createStaticResources();
 
-  m_painterOverlay = new PainterOverlay();
+  //m_painterOverlay = new PainterOverlay();
 }
 
 void MapWidget::resizeGL(int w, int h)
@@ -79,16 +79,18 @@ void MapWidget::resizeGL(int w, int h)
 
   if (m_overlayImage)
   {
-    delete m_overlayImage;
+    //delete m_overlayImage;
   }
 
-  m_overlayImage = new QImage(w, h, QImage::Format_RGBA8888_Premultiplied);
-
-  m_painterOverlay->createTexture(m_overlayImage);
+  //m_overlayImage = new QImage(w, h, QImage::Format_RGBA8888_Premultiplied);
+  //m_painterOverlay->createTexture(m_overlayImage);
 }
 
 void MapWidget::paintGL()
 {
+  QTime time;
+  time.start();
+
   g_debugWidget->reset();
 
   g_dataResource->getMapObject()->newFrame();
@@ -97,9 +99,6 @@ void MapWidget::paintGL()
   {
     return;
   }
-
-  QTime time;
-  time.start();
 
   QOpenGLFunctions gl(context());
   m_transform.setGl(&gl);
@@ -141,7 +140,7 @@ void MapWidget::paintGL()
   */
 
 
-  //qDebug() << time.elapsed() << 1000 / (float)time.elapsed() << g_dataResource->getMapObject()->getObjectCount();
+  //qDebug() << time.elapsed() << 1000 / (float)time.elapsed();
   //qDebug() << SkMath::toDeg(mapParam.m_fov);
 
   writeDebug();
@@ -268,8 +267,9 @@ void MapWidget::addStarMagnitude(double add)
 void MapWidget::writeDebug()
 {
   int mem;
+
   glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &mem);
-  g_debugWidget->addText("GPU Usage", QString("%1 kB").arg(StringUtils::addComma(gpuTotalMemory - mem)));
+  g_debugWidget->addText("GPU Free", QString("%1 kB").arg(StringUtils::addComma(mem)));
 
   g_debugWidget->addText("Tycho", QString("%1 kB").arg(StringUtils::addComma(g_dataResource->getTycho()->getMemoryUsage() / 1024)));
 

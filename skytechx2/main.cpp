@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "dataresources.h"
 #include "debugwidget.h"
+#include "xmlsetting.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -12,6 +13,8 @@
 #include <QVector>
 #include <QList>
 #include <QTime>
+
+XmlSetting g_systemSetting;
 
 QVector <int> vec;
 QList <int> list;
@@ -59,38 +62,19 @@ int main(int argc, char *argv[])
 
   QSurfaceFormat fmt;
 
-  QTime tt;
 
-  vec.reserve(1000001);
-
-  tt.start();
-  test1();
-  qDebug() << 1 << tt.elapsed() << vec.capacity();
-
-  tt.start();
-  test2();
-  qDebug() << 2 << tt.elapsed() ;
-
-  tt.start();
-  test11();
-  qDebug() << 11 << tt.elapsed();
-
-  tt.start();
-  test22();
-  qDebug() << 22 << tt.elapsed();
-
-  qDebug() << bb;
-
-  fmt.setStencilBufferSize(0);
-  fmt.setDepthBufferSize(0);
-  fmt.setSamples(16);
   fmt.setOption(QSurfaceFormat::DebugContext);
   fmt.setVersion(2, 1);
   fmt.setProfile(QSurfaceFormat::CoreProfile);
+  fmt.setStencilBufferSize(0);
+  fmt.setDepthBufferSize(0);
+  fmt.setSamples(16);
 
   QSurfaceFormat::setDefaultFormat(fmt);
 
-  qDebug() << fmt.depthBufferSize();
+  qDebug() << "depth" << fmt.depthBufferSize();
+
+  g_systemSetting.load("settings/system.xml");
 
   g_dataResource = new DataResources();
 
@@ -102,8 +86,6 @@ int main(int argc, char *argv[])
   mainWindow->show();
   mainWindow->resize(1600, 900);
   mainWindow->move(100, 100);
-
-
 
   return a.exec();
 }

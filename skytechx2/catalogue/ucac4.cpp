@@ -137,6 +137,9 @@ ucac4Region_t *UCAC4::getRegion(int region)
           skStar.zone = z;
           */
 
+          star.ucac4_zone = z;
+          star.ucac4_number = ucac4Index;
+
           regionPtr->m_stars.append(star);
         }
         ucac4Index++;

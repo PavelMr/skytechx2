@@ -24,6 +24,7 @@ void Transform::setTransform(double width, double height, MapParam &param)
   QMatrix4x4 vX;
   QMatrix4x4 vY;
   QMatrix4x4 vZ;
+  QMatrix4x4 scale;
 
   m_mapParam = param;
 
@@ -40,13 +41,15 @@ void Transform::setTransform(double width, double height, MapParam &param)
 
   float aspect = width / height;
 
+  scale.scale(param.m_flipX ? -1 : 1, param.m_flipY ? -1 : 1, 1);
+
   projection.perspective(SkMath::toDeg(param.m_fov) / aspect, aspect, 0.01, 1.1);
   projectionFrustum.perspective(SkMath::toDeg(param.m_fov * 1.2) / aspect, aspect, 0.01, 1.1);
 
   m_viewMatrix = view;
-  m_matViewNoPrecess = view;
-  m_mvpMatrix = projection * view;
-  m_projMatrix = projection;
+  m_matViewNoPrecess = view * scale;
+  m_mvpMatrix = projection * scale * view;
+  m_projMatrix = projection * scale;
 
   QMatrix4x4 planeMatrix = projectionFrustum * view;
 

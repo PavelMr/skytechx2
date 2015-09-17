@@ -13,7 +13,7 @@ TextRenderer::TextRenderer() :
 {
 }
 
-void TextRenderer::createTexture(QString objName, int size, QString fontName, int fontSize, QVector4D color)
+void TextRenderer::createTexture(QString objName, int size, QString fontName, int fontSize, QColor color)
 {
   if (m_image)
   {
@@ -52,6 +52,7 @@ void TextRenderer::addText(const QString &text, const RaDec &rd, int align, floa
   p.setRenderHint(QPainter::Antialiasing);
   p.setRenderHint(QPainter::TextAntialiasing);
   p.setFont(QFont(m_fontName, m_fontSize));
+  p.setPen(m_color);
 
   // TODO: kontrola stejneho textu
 
@@ -104,7 +105,6 @@ void TextRenderer::addText(const QString &text, const RaDec &rd, int align, floa
     texts.rect = br;
     m_texts.append(texts);
 
-    p.setPen(Qt::white);
     p.drawText(br, Qt::AlignCenter, text);
     m_lastX = br.right() + 2;
   }
