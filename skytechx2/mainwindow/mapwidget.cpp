@@ -139,7 +139,7 @@ void MapWidget::paintGL()
   m_painterOverlay->render(&m_transform, m_overlayImage);
   */
 
-
+  g_debugWidget->addText("FSP", QString::number(1000 / (float)time.elapsed()));
   //qDebug() << time.elapsed() << 1000 / (float)time.elapsed();
   //qDebug() << SkMath::toDeg(mapParam.m_fov);
 

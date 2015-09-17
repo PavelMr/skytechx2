@@ -14,7 +14,7 @@ public:
   LayerDSO();
   void createResources();
   void render(Transform *transform);
-  static bool showDSO(Transform *transform, dso_t *dso);
+  static bool checkShowDSO(Transform *transform, dso_t *dso);
 
 private:
   QOpenGLBuffer        m_buffer;

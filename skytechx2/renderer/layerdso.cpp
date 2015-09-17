@@ -26,7 +26,7 @@ LayerDSO::LayerDSO()
 
 void LayerDSO::createResources()
 {
-  dtr.createTexture(512, "arial", 12);
+  dtr.createTexture(512, "arial", 12, Qt::red);
 
   m_program.addShaderFromSourceCode(QOpenGLShader::Vertex, Renderer::readShader(":/res/opengl/dso_vshader.glsl"));
   m_program.addShaderFromSourceCode(QOpenGLShader::Geometry, Renderer::readShader(":/res/opengl/dso_gshader.glsl"));
@@ -46,6 +46,7 @@ void LayerDSO::createResources()
   m_buffer.allocate(MAX_DSO_ON_SCREEN * sizeof(dsoVertex_t));
 }
 
+
 void LayerDSO::render(Transform *transform)
 {
   QVector <int> dsoTexts;
@@ -55,6 +56,8 @@ void LayerDSO::render(Transform *transform)
 
   m_buffer.bind();
   dsoVertex_t *ptr = (dsoVertex_t *)m_buffer.map(QOpenGLBuffer::WriteOnly);
+
+  float minSize = (1.f / (float)transform->m_width) * 10;
 
   for (int y = 0; y < NUM_DSO_SEG_Y; y++)
   {
@@ -74,10 +77,15 @@ void LayerDSO::render(Transform *transform)
         {
           if (DSO_MAG(dsoItem->mag) <= transform->getMapParam()->m_maxStarMag)
           {
+            float scale = dsoItem->sx / 3600. / (180 / M_PI) / transform->getMapParam()->m_fov;
+
+            if (scale > minSize)
+            {
+              dsoTexts.append(index);
+            }
+
             Vector3 vec;
             Transform::rdToVector(dsoItem->rd, vec);
-
-            dsoTexts.append(index);
 
             ptr->pos = vec.toQVector();
             ptr->params[0] = (dsoItem->pa == NO_DSO_PA) ? 0.0 : (SkMath::toRad(dsoItem->pa) + (transform->getMapParam()->m_flipX ? -R90 : 0)
@@ -89,8 +97,6 @@ void LayerDSO::render(Transform *transform)
             count++;
 
             g_dataResource->getMapObject()->addDSO(index);
-
-            //ccq += 6 * 5 * 4 * dso->getObjectName(index).count();
           }
         }
       }
@@ -148,17 +154,20 @@ void LayerDSO::render(Transform *transform)
 
   dtr.begin(transform);
 
+  float aspectRatio = transform->m_width / transform->m_height;
+
   foreach (int index, dsoTexts)
   {
     dso_t *dsoItem = &dso->m_dso[index];
 
-    dtr.render(transform, dsoItem->rd, dso->getObjectName(index), 0);
+    float bottomOffset = 1.1 * SkMath::toRad(dsoItem->sx / 3600.) / transform->m_fov;
+    dtr.render(transform, dsoItem->rd, dso->getObjectName(index), bottomOffset * aspectRatio);
   }
 
   dtr.end(transform);
 }
 
-bool LayerDSO::showDSO(Transform *transform, dso_t *dso)
+bool LayerDSO::checkShowDSO(Transform *transform, dso_t *dso)
 {
 
 }
